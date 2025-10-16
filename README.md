@@ -16,6 +16,6 @@
 
 ## 📦 نصب و راه‌اندازی
 ```bash
-git clone https://github.com/your-username/idea-ai.git
+git clone https://github.com/spacelovers/idea-ai.git
 cd idea-ai
 # دستورات نصب...
