@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ایده - چت هوش مصنوعی پیشرفته</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700&amp;family=Poppins:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #6366f1;
+            --secondary-color: #8b5cf6;
+            --accent-color: #ec4899;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-tertiary: #334155;
+            --text-primary: #f1f5f9;
+            --text-secondary: #cbd5e1;
+            --border-color: #475569;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+        }
+
+        body {
+            font-family: 'Vazirmatn', 'Poppins', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            transition: all 0.3s ease;
+            height: 100vh;
+            position: relative;
+            font-size: 16px;
+        }
+
+        /* بهبود responsive برای موبایل */
+        @media (max-width: 768px) {
+            body {
+                font-size: 14px;
+            }
+        }
+
+        /* بقیه استایل‌ها مانند قبل... */
+
+        /* بهبود برای موبایل */
+        @media (max-width: 768px) {
+            .header {
+                padding: 0.5rem 1rem;
+                flex-wrap: wrap;
+            }
+
+            .logo-section {
+                flex: 1;
+                min-width: 120px;
+            }
+
+            .header-controls {
+                flex-wrap: wrap;
+                gap: 0.3rem;
+                justify-content: flex-end;
+            }
+
+            .ai-selector-wrapper {
+                order: 1;
+                width: 100%;
+                margin-top: 0.5rem;
+            }
+
+            .ai-dropdown {
+                min-width: 100%;
+                font-size: 0.8rem;
+                padding: 0.5rem;
+            }
+
+            .main-container {
+                grid-template-columns: 1fr;
+                height: calc(100vh - 60px);
+            }
+
+            .side-panel {
+                position: fixed;
+                top: 60px;
+                right: 0;
+                height: calc(100vh - 60px);
+                width: 85vw;
+                max-width: 300px;
+                z-index: 1000;
+                transform: translateX(100%);
+                transition: transform 0.3s ease;
+            }
+
+            .side-panel.active {
+                transform: translateX(0);
+            }
+
+            .chat-messages {
+                padding: 1rem 0.8rem;
+            }
+
+            .message-content {
+                max-width: 85%;
+            }
+
+            .message-bubble {
+                padding: 0.8rem 1rem;
+                font-size: 0.9rem;
+            }
+        }
+
+        /* Training Modal */
+        .training-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 3000;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .training-modal.active {
+            display: flex;
+        }
+
+        .training-content {
+            background: var(--bg-secondary);
+            border-radius: 20px;
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .training-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .file-upload-area {
+            border: 2px dashed var(--border-color);
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .file-upload-area:hover {
+            border-color: var(--primary-color);
+            background: var(--bg-tertiary);
+        }
+
+        .training-progress {
+            background: var(--bg-tertiary);
+            border-radius: 10px;
+            height: 8px;
+            margin: 1rem 0;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            background: var(--primary-color);
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+    </style>
+</head>
+<body class="theme-colorful-purple">
+    <!-- Header و بقیه المان‌ها مانند قبل -->
+    <header class="header">
+        <div class="logo-section">
+            <div class="logo">
+                <i class="fas fa-brain"></i>
+            </div>
+            <div class="logo-text">
+                <h1 class="aria-title">ایده AI</h1>
+                <p class="aria-subtitle">دستیار هوش مصنوعی پیشرفته</p>
+            </div>
+        </div>
+
+        <div class="header-controls">
+            <!-- AI Selector - بالا چپ -->
+            <div class="ai-selector-wrapper">
+                <select class="ai-dropdown" id="aiModelSelector">
+                    <option value="aria">ایده (مدل اختصاصی)</option>
+                    <option value="gpt4">GPT-4 Turbo</option>
+                    <option value="claude">Claude 3 Opus</option>
+                    <option value="gemini">Google Gemini Pro</option>
+                    <option value="llama">Meta LLaMA 3</option>
+                </select>
+            </div>
+
+            <button class="settings-icon-btn" id="openSettings" title="تنظیمات">
+                <i class="fas fa-cog"></i>
+            </button>
+
+            <div class="theme-switcher">
+                <button class="theme-btn" data-theme="dark" title="تم تیره">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <button class="theme-btn" data-theme="light" title="تم روشن">
+                    <i class="fas fa-sun"></i>
+                </button>
+                <button class="theme-btn" data-theme="colorful-blue" title="آبی">
+                    <i class="fas fa-droplet"></i>
+                </button>
+                <button class="theme-btn" data-theme="colorful-green" title="سبز">
+                    <i class="fas fa-leaf"></i>
+                </button>
+                <button class="theme-btn active" data-theme="colorful-purple" title="بنفش">
+                    <i class="fas fa-star"></i>
+                </button>
+            </div>
+
+            <div class="lang-switcher">
+                <button class="lang-btn active" data-lang="fa" title="فارسی">فا</button>
+                <button class="lang-btn" data-lang="en" title="English">EN</button>
+            </div>
+        </div>
+    </header>
+    <!-- Training Modal -->
+    <div class="training-modal" id="trainingModal">
+        <div class="training-content">
+            <div class="settings-header">
+                <h2>
+                    <i class="fas fa-robot"></i>
+                    <span>آموزش دستیار هوش مصنوعی</span>
+                </h2>
+                <button class="close-settings" onclick="closeTrainingModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <div class="training-section">
+                <h3>آپلود دیتاست آموزشی</h3>
+                <div class="file-upload-area" id="datasetUploadArea">
+                    <i class="fas fa-cloud-upload-alt" style="font-size: 3rem; margin-bottom: 1rem; color: var(--text-secondary);"></i>
+                    <p>فایل Excel یا CSV خود را اینجا رها کنید</p>
+                    <p style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.5rem;">
+                        فرمت‌های پشتیبانی شده: .xlsx, .xls, .csv
+                    </p>
+                    <button class="upload-btn" style="margin-top: 1rem;">
+                        <i class="fas fa-file-excel"></i>
+                        انتخاب فایل
+                    </button>
+                </div>
+                <input type="file" id="datasetFile" accept=".xlsx,.xls,.csv" style="display: none;">
+            </div>
+
+            <div class="training-section">
+                <h3>تنظیمات آموزش</h3>
+                <div style="display: grid; gap: 1rem;">
+                    <div>
+                        <label style="display: block; margin-bottom: 0.5rem;">مدل هدف:</label>
+                        <select class="ai-dropdown" style="width: 100%;">
+                            <option value="aria">ایده (مدل اختصاصی)</option>
+                            <option value="custom">مدل سفارشی</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label style="display: block; margin-bottom: 0.5rem;">تعداد دوره‌های آموزش:</label>
+                        <input type="number" class="custom-bg-input" value="10" min="1" max="100">
+                    </div>
+                </div>
+            </div>
+
+            <div class="training-section">
+                <h3>پیشرفت آموزش</h3>
+                <div class="training-progress">
+                    <div class="progress-bar" id="trainingProgress"></div>
+                </div>
+                <div style="text-align: center; margin-top: 0.5rem;">
+                    <span id="progressText">0%</span>
+                </div>
+            </div>
+
+            <button class="upload-btn" id="startTraining" style="width: 100%;">
+                <i class="fas fa-play"></i>
+                شروع آموزش
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // مدیریت آموزش مدل
+        const trainingModal = document.getElementById('trainingModal');
+        const datasetUploadArea = document.getElementById('datasetUploadArea');
+        const datasetFile = document.getElementById('datasetFile');
+        const trainingProgress = document.getElementById('trainingProgress');
+        const progressText = document.getElementById('progressText');
+        const startTraining = document.getElementById('startTraining');
+
+        function openTrainingModal() {
+            trainingModal.classList.add('active');
+        }
+
+        function closeTrainingModal() {
+            trainingModal.classList.remove('active');
+        }
+
+        // مدیریت آپلود فایل
+        datasetUploadArea.addEventListener('click', () => {
+            datasetFile.click();
+        });
+
+        datasetUploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            datasetUploadArea.style.borderColor = 'var(--primary-color)';
+            datasetUploadArea.style.background = 'var(--bg-tertiary)';
+        });
+
+        datasetUploadArea.addEventListener('dragleave', () => {
+            datasetUploadArea.style.borderColor = 'var(--border-color)';
+            datasetUploadArea.style.background = '';
+        });
+
+        datasetUploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleDatasetFile(files[0]);
+            }
+        });
+
+        datasetFile.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleDatasetFile(e.target.files[0]);
+            }
+        });
+
+        function handleDatasetFile(file) {
+            const validTypes = ['.xlsx', '.xls', '.csv'];
+            const fileExtension = '.' + file.name.split('.').pop().toLowerCase();
+
+            if (!validTypes.includes(fileExtension)) {
+                alert('لطفاً فقط فایل‌های Excel یا CSV آپلود کنید.');
+                return;
+            }
+
+            datasetUploadArea.innerHTML = `
+                <i class="fas fa-check-circle" style="font-size: 3rem; margin-bottom: 1rem; color: var(--success-color);"></i>
+                <p>${file.name}</p>
+                <p style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.5rem;">
+                    فایل با موفقیت انتخاب شد
+                </p>
+            `;
+        }
+
+        // شبیه‌سازی فرآیند آموزش
+        startTraining.addEventListener('click', async () => {
+            let progress = 0;
+            startTraining.disabled = true;
+            startTraining.innerHTML = '<i class="fas fa-sync fa-spin"></i> در حال آموزش...';
+
+            const interval = setInterval(() => {
+                progress += Math.random() * 10;
+                if (progress >= 100) {
+                    progress = 100;
+                    clearInterval(interval);
+                    startTraining.innerHTML = '<i class="fas fa-check"></i> آموزش تکمیل شد';
+                    setTimeout(() => {
+                        closeTrainingModal();
+                        startTraining.disabled = false;
+                        startTraining.innerHTML = '<i class="fas fa-play"></i> شروع آموزش';
+                        datasetUploadArea.innerHTML = `
+                            <i class="fas fa-cloud-upload-alt" style="font-size: 3rem; margin-bottom: 1rem; color: var(--text-secondary);"></i>
+                            <p>فایل Excel یا CSV خود را اینجا رها کنید</p>
+                            <button class="upload-btn" style="margin-top: 1rem;">
+                                <i class="fas fa-file-excel"></i>
+                                انتخاب فایل
+                            </button>
+                        `;
+                    }, 2000);
+                }
+
+                trainingProgress.style.width = progress + '%';
+                progressText.textContent = Math.round(progress) + '%';
+            }, 500);
+        });
+
+        // اضافه کردن دکمه آموزش به پنل
+        document.querySelector('.panel-footer').innerHTML += `
+            <div class="footer-menu-item" onclick="openTrainingModal()">
+                <i class="fas fa-graduation-cap"></i>
+                <span>آموزش دستیار</span>
+            </div>
+        `;
+    </script>
+</body>
+</html>

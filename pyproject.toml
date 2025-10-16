@@ -1,0 +1,367 @@
+[project]
+name = "idea-ai"
+version = "1.0.0"
+description = "دستیار هوش مصنوعی پیشرفته ایده AI"
+authors = [
+    {name = "ali behzad", email = "inkwebapp@gmail.com"},
+]
+readme = "README.md"
+license = {text = "r/github"}
+keywords = ["ai", "chat", "assistant", "persian", "nlp"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: r/github License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi>=0.104.1,<0.105.0",
+    "uvicorn[standard]>=0.24.0,<0.25.0",
+    "pydantic>=2.5.0,<3.0.0",
+    "python-multipart>=0.0.6,<0.1.0",
+    "sqlalchemy>=2.0.23,<3.0.0",
+    "alembic>=1.12.1,<2.0.0",
+    "python-jose[cryptography]>=3.3.0,<4.0.0",
+    "passlib[bcrypt]>=1.7.4,<2.0.0",
+    "python-dotenv>=1.0.0,<2.0.0",
+    "httpx>=0.25.2,<0.26.0",
+    "openai>=1.3.0,<2.0.0",
+    "transformers>=4.35.2,<5.0.0",
+    "torch>=2.1.0,<3.0.0",
+    "numpy>=1.24.3,<2.0.0",
+    "pandas>=2.1.4,<3.0.0",
+    "scikit-learn>=1.3.2,<2.0.0",
+    "speechrecognition>=3.10.0,<4.0.0",
+    "pydub>=0.25.1,<0.26.0",
+    "pydantic-settings>=2.1.0,<3.0.0",
+    "python-dateutil>=2.8.2,<3.0.0",
+    "pytz>=2023.3",
+    "click>=8.1.7,<9.0.0",
+    "pandas>=2.1.4,<3.0.0",
+    "openpyxl>=3.1.2,<4.0.0",
+    "aiofiles>=23.2.1,<24.0.0",
+    "python-magic>=0.4.27,<0.5.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.3,<8.0.0",
+    "pytest-asyncio>=0.21.1,<0.22.0",
+    "pytest-cov>=4.1.0,<5.0.0",
+    "black>=23.11.0,<24.0.0",
+    "isort>=5.13.2,<6.0.0",
+    "flake8>=6.1.0,<7.0.0",
+    "mypy>=1.7.1,<2.0.0",
+    "pre-commit>=3.5.0,<4.0.0",
+    "ipython>=8.17.2,<9.0.0",
+    "jupyter>=1.0.0,<2.0.0",
+]
+prod = [
+    "gunicorn>=21.2.0,<22.0.0",
+    "psycopg2-binary>=2.9.7,<3.0.0",
+    "redis>=5.0.1,<6.0.0",
+    "celery>=5.3.4,<6.0.0",
+]
+voice = [
+    "pyttsx3>=2.90,<3.0.0",
+    "pyaudio>=0.2.11,<0.3.0",
+]
+ml = [
+    "sentence-transformers>=2.2.2,<3.0.0",
+    "faiss-cpu>=1.7.4,<2.0.0",
+    "langchain>=0.0.350,<0.1.0",
+    "langchain-community>=0.0.10,<0.1.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/id-eaai/idea-ai-project"
+Documentation = "https://docs.ideaai.ir"
+Repository = "https://github.com/idea-ai/idea-ai-project"
+"Bug Reports" = "https://github.com/idea-ai/idea-ai-project/issues"
+"Changelog" = "https://github.com/idea-ai/idea-ai-project/releases"
+
+[project.scripts]
+idea-ai = "backend.api.main:main"
+idea-ai-cli = "backend.scripts.cli:app"
+
+[project.entry-points."console_scripts"]
+idea-ai-serve = "backend.api.main:serve"
+idea-ai-train = "backend.scripts.training.train:main"
+idea-ai-eval = "backend.scripts.evaluation.evaluate:main"
+
+[tool.black]
+target-version = ['py311']
+line-length = 88
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+  # directories
+  \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | build
+  | dist
+  | migrations
+)/
+'''
+
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+line_length = 88
+known_first_party = ["backend"]
+
+[tool.mypy]
+python_version = "3.11"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_untyped_decorators = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+warn_unreachable = true
+strict_equality = true
+show_error_codes = true
+
+[[tool.mypy.overrides]]
+module = [
+    "pydantic.*",
+    "sqlalchemy.*",
+    "alembic.*",
+]
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["backend/tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "--strict-markers",
+    "--strict-config",
+    "--cov=backend",
+    "--cov-report=term-missing",
+    "--cov-report=html",
+    "--asyncio-mode=auto",
+]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "integration: marks tests as integration tests",
+    "unit: marks tests as unit tests",
+]
+
+[tool.coverage.run]
+source = ["backend"]
+omit = [
+    "backend/tests/*",
+    "backend/scripts/*",
+    "backend/**/__pycache__/*",
+    "backend/**/migrations/*",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if self.debug:",
+    "if settings.DEBUG",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if 0:",
+    "if __name__ == .__main__.:",
+    "class .*\\bProtocol\\b": "",
+    "@(abc\\.)?abstractmethod",
+]
+
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["backend*"]
+exclude = ["backend/tests*", "backend/scripts*"]
+
+# Configuration for FastAPI
+[tool.fastapi]
+title = "ایده AI API"
+version = "1.0.0"
+description = "API برای دستیار هوش مصنوعی پیشرفته ایده"
+
+# Configuration for Uvicorn
+[tool.uvicorn]
+app = "backend.api.main:app"
+host = "0.0.0.0"
+port = 8000
+reload = true
+log_level = "info"
+
+# Database configuration
+[tool.database]
+url = "sqlite:///./idea_ai.db"
+echo = false
+
+# AI Models configuration
+[tool.ai.models]
+default = "aria"
+available = ["aria", "gpt4", "claude", "gemini", "llama"]
+
+[tool.ai.aria]
+name = "ایده (مدل اختصاصی)"
+type = "text"
+description = "مدل اختصاصی ایده برای پردازش زبان فارسی"
+
+[tool.ai.gpt4]
+name = "GPT-4 Turbo"
+type = "text"
+provider = "openai"
+
+[tool.ai.claude]
+name = "Claude 3 Opus"
+type = "text"
+provider = "anthropic"
+
+[tool.ai.gemini]
+name = "Google Gemini Pro"
+type = "text"
+provider = "google"
+
+[tool.ai.llama]
+name = "Meta LLaMA 3"
+type = "text"
+provider = "meta"
+
+# Voice processing configuration
+[tool.voice]
+default_language = "fa"
+supported_languages = ["fa", "en", "ar"]
+timeout = 30
+
+[tool.voice.tts]
+default_voice = "persian"
+available_voices = ["persian-male", "persian-female", "english-male", "english-female"]
+
+# Text analysis configuration
+[tool.analysis]
+sentiment = true
+entities = true
+keywords = true
+summarization = true
+translation = true
+
+# Security configuration
+[tool.security]
+jwt_secret = "change-this-in-production"
+jwt_algorithm = "HS256"
+jwt_expire_minutes = 30
+password_min_length = 8
+
+# CORS configuration
+[tool.cors]
+allow_origins = ["http://localhost:3000", "http://127.0.0.1:3000"]
+allow_credentials = true
+allow_methods = ["*"]
+allow_headers = ["*"]
+
+# Logging configuration
+[tool.logging]
+level = "INFO"
+format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+date_format = "%Y-%m-%d %H:%M:%S"
+
+[tool.logging.handlers.console]
+class = "logging.StreamHandler"
+level = "INFO"
+formatter = "default"
+
+[tool.logging.handlers.file]
+class = "logging.handlers.RotatingFileHandler"
+filename = "logs/idea-ai.log"
+maxBytes = 10485760
+backupCount = 5
+level = "INFO"
+formatter = "default"
+
+# Training configuration
+[tool.training]
+batch_size = 32
+learning_rate = 0.001
+epochs = 100
+early_stopping_patience = 10
+
+[tool.training.dataset]
+max_length = 512
+train_split = 0.8
+val_split = 0.1
+test_split = 0.1
+
+# Deployment configuration
+[tool.deployment]
+environment = "development"
+debug = true
+reload = true
+
+[tool.deployment.production]
+environment = "production"
+debug = false
+reload = false
+
+# Monitoring configuration
+[tool.monitoring]
+enabled = true
+prometheus_port = 9090
+grafana_port = 3001
+health_check_interval = 30
+
+# Cache configuration
+[tool.cache]
+backend = "memory"
+ttl = 300
+
+[tool.cache.redis]
+host = "localhost"
+port = 6379
+db = 0
+password = ""
+
+# Email configuration (for notifications)
+[tool.email]
+enabled = false
+smtp_server = "smtp.gmail.com"
+smtp_port = 587
+sender_email = ""
+sender_password = ""
+
+# Persian language specific configuration
+[tool.persian]
+rtl = true
+default_font = "Vazirmatn"
+supported_fonts = ["Vazirmatn", "IranSans", "BYekan"]
+
+[tool.persian.datetime]
+calendar = "jalali"
+timezone = "Asia/Tehran"
+date_format = "YYYY/MM/DD"
+time_format = "HH:mm:ss"
+
+# Feature flags
+[tool.features]
+chat = true
+voice = true
+analysis = true
+multilingual = true
+real_time = true
+file_upload = true
+themes = true
+notifications = true
