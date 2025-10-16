@@ -1,5 +1,5 @@
 # README.md
-# idea-ai-project
+# idea-ai
 پروژه دستیار هوش مصنوعی پیشرفته ایده AI
 
 ## 🚀 ویژگی‌ها
@@ -16,6 +16,6 @@
 
 ## 📦 نصب و راه‌اندازی
 ```bash
-git clone https://github.com/your-username/idea-ai-project.git
-cd idea-ai-project
+git clone https://github.com/your-username/idea-ai.git
+cd idea-ai
 # دستورات نصب...
